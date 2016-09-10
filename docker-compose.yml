@@ -1,0 +1,11 @@
+taskservice:
+    build: .
+    dockerfile: Dockerfile
+    ports:
+    - "8080:8080"
+    volumes:
+        - $GOPATH/src/github.com/bsedg/slacker:/go/src/github.com/bsedg/tasker
+    working_dir: /go/src/github.com/bsedg/tasker
+    environment:
+        - PORT=:8080
+        - VERSION_FILE=/version
