@@ -1,34 +1,23 @@
 package main
 
 import (
-	"io"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/bsedg/tasker"
 )
 
-func setup() {
-	log.Println("taskservice")
-}
-
 func main() {
+	log.Println("taskservice")
+
 	port := os.Getenv("PORT")
 
-	http.HandleFunc("/ping", PongHandler)
-	http.HandleFunc("/version", VersionHandler)
+	// Register HTTP endpoints with handlers.
+	http.HandleFunc("/ping", tasker.PongHandler)
+	http.HandleFunc("/version", tasker.VersionHandler)
+	http.HandleFunc("/tasks", tasker.TasksHandler)
+
 	log.Printf("listening on port %s", port)
 	log.Fatal(http.ListenAndServe(port, nil))
-}
-
-type TaskerContext struct {
-	VersionFile string
-}
-
-func PongHandler(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, "pong\n")
-}
-
-func VersionHandler(w http.ResponseWriter, r *http.Request) {
-	versionFile := os.Getenv("VERSION_FILE")
-	http.ServeFile(w, r, versionFile)
 }
