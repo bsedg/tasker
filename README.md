@@ -5,3 +5,21 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Tasker is a service to manage tasks that can be scheduled.
+
+## Development
+
+```
+# build the service
+docker-compose build
+
+# run the service
+docker-compose up
+
+# assuming 'dockerhost' for the host
+# create a task
+curl -i -X POST dockerhost:8080/tasks \
+    -d '{"name": "test", "action": "noop", "time": "now"}'
+
+# get all tasks
+curl -i dockerhost:8080/tasks
+```
