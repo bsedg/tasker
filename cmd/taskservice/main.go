@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -9,14 +10,25 @@ import (
 )
 
 func main() {
-	log.Println("taskservice")
+	var (
+		port        = os.Getenv("PORT")
+		versionFile = os.Getenv("VERSION_FILE")
+	)
 
-	port := os.Getenv("PORT")
+	ctx := &tasker.TaskerContext{
+		Tasks: tasker.NewTaskStore(),
+	}
 
-	// Register HTTP endpoints with handlers.
-	http.HandleFunc("/ping", tasker.PongHandler)
-	http.HandleFunc("/version", tasker.VersionHandler)
-	http.HandleFunc("/tasks", tasker.TasksHandler)
+	// Register helper HTTP endpoints with handlers.
+	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, "pong\n")
+	})
+	http.HandleFunc("/version", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, versionFile)
+	})
+
+	// Register tasker HTTP endpoints with handlers.
+	http.HandleFunc("/tasks", tasker.NewHandler(ctx, tasker.TasksHandler))
 
 	log.Printf("listening on port %s", port)
 	log.Fatal(http.ListenAndServe(port, nil))
