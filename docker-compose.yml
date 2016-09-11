@@ -1,11 +1,20 @@
 taskservice:
     build: .
     dockerfile: Dockerfile
+    links:
+        - redis
     ports:
-    - "8080:8080"
+        - "8080:8080"
     volumes:
         - $GOPATH/src/github.com/bsedg/slacker:/go/src/github.com/bsedg/tasker
     working_dir: /go/src/github.com/bsedg/tasker
     environment:
         - PORT=:8080
+        - REDIS_HOST=redis
+        - REDIS_PORT=6379
         - VERSION_FILE=/version
+
+redis:
+    image: redis
+    ports:
+        - "6379:6379"

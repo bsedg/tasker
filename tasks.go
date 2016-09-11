@@ -3,6 +3,8 @@ package tasker
 import (
 	"fmt"
 	"math/rand"
+
+	"gopkg.in/redis.v4"
 )
 
 type TaskStore struct {
