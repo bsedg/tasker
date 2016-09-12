@@ -15,11 +15,13 @@ docker-compose build
 # run the service
 docker-compose up
 
-# assuming 'dockerhost' for the host
+# initialize the database by creating tables, etc.
+curl -i -x POST localhost:80/db/init --header "X-Tasker-Authentication: <AUTH_KEY>"
+
 # create a task
-curl -i -X POST dockerhost:8080/tasks \
+curl -i -X POST localhost:80/tasks \
     -d '{"name": "test", "action": "noop", "time": "now"}'
 
 # get all tasks
-curl -i dockerhost:8080/tasks
+curl -i localhost:80/tasks
 ```

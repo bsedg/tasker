@@ -1,59 +1,95 @@
 package tasker
 
 import (
+	"database/sql"
 	"fmt"
+	"log"
 	"math/rand"
+	"time"
 
-	"gopkg.in/redis.v4"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type TaskStore struct {
-	Tasks map[int64]*Task
+	DB *sql.DB
 }
 
-func NewTaskStore() *TaskStore {
-	return &TaskStore{
-		Tasks: make(map[int64]*Task),
+// InitDatabase initialized data tables.
+// TODO: this may need to live elsewhere.
+func InitDatabase(db *sql.DB) error {
+	_, err := db.Exec("DROP TABLE IF EXISTS tasks")
+	if err != nil {
+		return err
 	}
+
+	_, err = db.Exec("CREATE TABLE tasks (id BIGINT(18) NOT NULL AUTO_INCREMENT, name VARCHAR(255) DEFAULT NULL, action VARCHAR(255) DEFAULT NULL, time VARCHAR(255) DEFAULT NULL, created DATETIME DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (`id`))")
+	return err
 }
 
 func (ts *TaskStore) Save(t *Task) (*Task, error) {
+	var cmd string
 	if t.ID == 0 {
-		t = CreateTask(t.Name, t.Action, t.ScheduledTime)
+		// Create a new task.
+		cmd = fmt.Sprintf("INSERT INTO tasks (name, action, time) VALUES ('%s', '%s', '%s')",
+			t.Name, t.Action, t.ScheduledTime)
+	} else {
+		cmd = fmt.Sprintf("UPDATE tasks t SET t.name='%s', t.action='%s', t.time='%s' WHERE id = %d",
+			t.Name, t.Action, t.ScheduledTime, t.ID)
 	}
 
-	ts.Tasks[t.ID] = t
+	insert, err := ts.DB.Exec(cmd)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	id, err := insert.LastInsertId()
+	if t.ID == 0 && err != nil {
+		log.Println(err)
+	} else if t.ID == 0 {
+		t.ID = id
+	}
 
 	return t, nil
 }
 
-func (ts *TaskStore) GetAll() []*Task {
-	tasks := make([]*Task, len(ts.Tasks))
-
-	i := 0
-	for _, task := range ts.Tasks {
-		tasks[i] = task
-		i++
+func (ts *TaskStore) GetAll() ([]*Task, error) {
+	cmd := fmt.Sprintf("SELECT * from tasks")
+	rows, err := ts.DB.Query(cmd)
+	if err != nil {
+		log.Println(err)
+		return nil, err
 	}
-	return tasks
+	defer rows.Close()
+
+	tasks := []*Task{}
+	for rows.Next() {
+		t := &Task{}
+		if err := rows.Scan(&t.ID, &t.Name, &t.Action, &t.ScheduledTime, &t.Created); err != nil {
+			log.Println(err)
+			return nil, err
+		}
+		tasks = append(tasks, t)
+	}
+
+	return tasks, nil
 }
 
 func (ts *TaskStore) Get(id int64) *Task {
-	t, _ := ts.Tasks[id]
-
-	return t
+	return nil
 }
 
 func (ts *TaskStore) Delete(id int64) {
-	delete(ts.Tasks, id)
+
 }
 
 // Task encapsulates a named, scheduled task action.
 type Task struct {
-	ID            int64  `json:"id"`
-	Name          string `json:"name"`
-	Action        string `json:"action"`
-	ScheduledTime string `json:"time"`
+	ID            int64     `json:"id"`
+	Name          string    `json:"name"`
+	Action        string    `json:"action"`
+	ScheduledTime string    `json:"time"`
+	Created       time.Time `json:"created,omitempty"`
 }
 
 // Valid validates input for a task.

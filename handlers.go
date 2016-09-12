@@ -66,7 +66,13 @@ func NewHandler(ctx *TaskerContext, th TaskerHandler) http.HandlerFunc {
 func TasksHandler(c *TaskerContext, w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	switch r.Method {
 	case http.MethodGet:
-		return c.Tasks.GetAll(), http.StatusOK, nil
+		tasks, err := c.Tasks.GetAll()
+		if err != nil {
+			log.Println(err)
+			return nil, http.StatusInternalServerError, err
+		}
+
+		return tasks, http.StatusOK, nil
 	case http.MethodPost:
 		task := &Task{}
 		if err := json.NewDecoder(r.Body).Decode(task); err != nil {
