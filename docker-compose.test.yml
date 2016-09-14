@@ -1,3 +1,11 @@
+sut:
+    build: .
+    dockerfile: Dockerfile.test
+    environment:
+        - TASK_SERVICE_URL=http://taskservice:80
+    links:
+        - taskservice
+
 taskservice:
     build: .
     command: /go/bin/taskservice

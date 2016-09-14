@@ -89,7 +89,7 @@ type Task struct {
 	Name          string    `json:"name"`
 	Action        string    `json:"action"`
 	ScheduledTime string    `json:"time"`
-	Created       time.Time `json:"created,omitempty"`
+	Created       time.Time `json:"created"`
 }
 
 // Valid validates input for a task.

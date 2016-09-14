@@ -25,3 +25,8 @@ curl -i -X POST localhost:80/tasks \
 # get all tasks
 curl -i localhost:80/tasks
 ```
+
+### Integration tests
+Using the iREST framework to create HTTP integration tests, https://github.com/bsedg/irest, integration tests can be run with the appropriate build tags or with the docker-compose test.
+
+`docker-compose -f docker-compose.test.yml -p ci up -d`
