@@ -5,7 +5,7 @@ taskservice:
     links:
         - db
     ports:
-        - 80:8080
+        - 9000:8080
     volumes:
         - $GOPATH/src/github.com/bsedg/slacker:/go/src/github.com/bsedg/tasker
     working_dir: /go/src/github.com/bsedg/tasker
@@ -20,7 +20,8 @@ taskservice:
         - VERSION_FILE=/version
 
 db:
-    image: mysql:latest
+    build: .
+    dockerfile: DBDockerfile
     ports:
         - 3306
     environment:
@@ -28,5 +29,3 @@ db:
         - MYSQL_DATABASE=tasker
         - MYSQL_USER=taskerservice
         - MYSQL_PASSWORD=somepassword
-    volumes:
-      - ./.data/db:/var/lib/mysql

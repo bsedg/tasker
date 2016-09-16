@@ -2,7 +2,7 @@ sut:
     build: .
     dockerfile: Dockerfile.test
     environment:
-        - TASK_SERVICE_URL=http://taskservice:80
+        - TASK_SERVICE_URL=http://taskservice:9000
     links:
         - taskservice
 
@@ -36,5 +36,3 @@ db:
         - MYSQL_DATABASE=tasker
         - MYSQL_USER=taskerservice
         - MYSQL_PASSWORD=somepassword
-    volumes:
-      - ./.data/db:/var/lib/mysql

@@ -14,18 +14,6 @@ type TaskStore struct {
 	DB *sql.DB
 }
 
-// InitDatabase initialized data tables.
-// TODO: this may need to live elsewhere.
-func InitDatabase(db *sql.DB) error {
-	_, err := db.Exec("DROP TABLE IF EXISTS tasks")
-	if err != nil {
-		return err
-	}
-
-	_, err = db.Exec("CREATE TABLE tasks (id BIGINT(18) NOT NULL AUTO_INCREMENT, name VARCHAR(255) DEFAULT NULL, action VARCHAR(255) DEFAULT NULL, time VARCHAR(255) DEFAULT NULL, created DATETIME DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (`id`))")
-	return err
-}
-
 func (ts *TaskStore) Save(t *Task) (*Task, error) {
 	var cmd string
 	if t.ID == 0 {

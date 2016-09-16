@@ -19,7 +19,6 @@ const (
 
 func main() {
 	var (
-		authKey       = os.Getenv("AUTH_KEY")
 		port          = os.Getenv("PORT")
 		mysqlDatabase = os.Getenv("MYSQL_DATABASE")
 		mysqlPassword = os.Getenv("MYSQL_PASSWORD")
@@ -54,26 +53,6 @@ func main() {
 		io.WriteString(w, "pong\n")
 	})
 
-	// TODO: use proper status codes, responses, etc.
-	http.HandleFunc("/db/init", func(w http.ResponseWriter, r *http.Request) {
-		token, ok := r.Header[TaskerAuthHeader]
-		if !ok {
-			io.WriteString(w, "missing authentication: "+TaskerAuthHeader+"\n")
-			return
-		}
-
-		if token[0] != authKey {
-			io.WriteString(w, "wrong authentication token\n")
-			return
-		}
-
-		if err := tasker.InitDatabase(db); err != nil {
-			log.Println(err)
-			io.WriteString(w, "error: connection to database\n")
-			return
-		}
-		io.WriteString(w, "database initialized\n")
-	})
 	http.HandleFunc("/version", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, versionFile)
 	})

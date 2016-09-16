@@ -9,11 +9,8 @@ Tasker is a service to manage tasks that can be scheduled.
 ## Development
 
 ```
-# build the service
-docker-compose build
-
-# run the service
-docker-compose up
+# build and run the service
+docker-compose up -d --force-recreate taskservice
 
 # initialize the database by creating tables, etc.
 curl -i -x POST localhost:80/db/init --header "X-Tasker-Authentication: <AUTH_KEY>"

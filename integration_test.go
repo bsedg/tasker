@@ -33,6 +33,7 @@ func TestTaskService(t *testing.T) {
 	}
 
 	overallTest := irest.NewTest("tasks test")
+	// TODO: POST /tasks
 	getTest := overallTest.NewTest("get test")
 	GetAllTasksTestHelper(getTest).
 		MustStatus(http.StatusOK)
